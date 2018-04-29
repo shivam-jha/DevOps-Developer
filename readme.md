@@ -5,8 +5,8 @@
 
 ## Running petclinic locally
 ```
-	git clone https://github.com/spring-projects/spring-petclinic.git
-	cd spring-petclinic
+	git clone https://github.com/shivam-jha/DevOps-Developer.git
+	cd DevOps-Developer
 	./mvnw tomcat7:run
 ```
 
