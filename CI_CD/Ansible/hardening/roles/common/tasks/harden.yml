@@ -1,0 +1,71 @@
+- name: Ensure softlimit is set
+  lineinfile: "dest={{ ulimit }} line='ec2-user soft nofile 50000'"
+
+
+- name: Ensure hardlimit is set
+  lineinfile: "dest={{ ulimit }} line='ec2-user hard nofile 50000'"
+
+
+- copy: src=./audit.rules dest=/etc/audit/rules.d/audit.rules owner=root group=root mode="u+rwx,g-wx,o-rwx"
+
+- name: CHECK IF AUDITD SERVICE IS RUNNING
+  command: service auditd status
+  register: check_result
+  tags:
+      auditd
+
+###- name: RESTART AUDITD AND ENABLE
+- command: service auditd restart
+
+- sysctl:
+    name: net.ipv4.conf.all.forwarding
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv4.conf.all.secure_redirects
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv4.conf.all.send_redirects 
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv4.conf.default.send_redirects 
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv4.conf.default.log_martians
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv6.conf.default.accept_ra
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv6.conf.all.accept_redirects
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv6.conf.default.accept_redirects
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv6.conf.all.accept_ra
+    value: 0
+    sysctl_set: yes
+
+- sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+
+
+- copy: src=./sshd_config dest=/etc/ssh/sshd_config owner=root group=root mode="u+rwx,g-wx,o-rwx"

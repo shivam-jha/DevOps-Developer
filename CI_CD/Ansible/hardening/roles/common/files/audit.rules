@@ -1,0 +1,38 @@
+## Execute the following command to restart auditd # pkill -P 1-HUP auditd
+
+########## Time and Date Settings ########
+-w /etc/localtime -p wa -k audit_time_rules
+-a always,exit -F arch=b32 -S stime -F key=audit_time_rules
+-w /etc/localtime -p wa -k time-change
+-a always,exit -F arch=b32 -S clock_settime -k time-change
+-a always,exit -F arch=b64 -S clock_settime -k time-change
+-a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change
+-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change
+-a always,exit -F path=SETUID_PROG_PATH -F perm=x -F auid>=1000 -F auid!=4294967295 -F key=privileged
+
+######### log settings #########
+-w /var/log/btmp -p wa -k session
+-w /var/run/utmp -p wa -k session
+w /var/log/wtmp -p wa -k session
+-w /var/log/tallylog -p wa -k logins
+-w /var/log/lastlog -p wa -k logins
+-w /var/log/faillog -p wa -k logins
+-w /etc/selinux/ -p wa -k MAC-policy
+-w /etc/sysconfig/network -p wa -k audit_rules_networkconfig_modification
+-w /etc/hosts -p wa -k audit_rules_networkconfig_modification
+-w /etc/issue.net -p wa -k audit_rules_networkconfig_modification
+-w /etc/issue -p wa -k audit_rules_networkconfig_modification
+-a always,exit -F arch=ARCH -S sethostname,setdomainname -F key=audit_rules_networkconfig_modification
+
+#Password Resets && group audit settings
+-w /etc/security/opasswd -p wa -k audit_rules_usergroup_modification
+-w /etc/shadow -p wa -k audit_rules_usergroup_modification
+-w /etc/gshadow -p wa -k audit_rules_usergroup_modification
+-w /etc/passwd -p wa -k audit_rules_usergroup_modification
+-w /etc/group -p wa -k audit_rules_usergroup_modification
+
+##### Perm Audit #######
+
+-a always,exit -F arch=ARCH -S chmod -S fchmod -S fchmodat -F auid>=500 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=ARCH -S chown -S fchown -S fchownat -S lchown -F auid>=500 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=ARCH -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=500 -F auid!=4294967295 -k perm_mod

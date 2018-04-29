@@ -1,0 +1,39 @@
+FROM jenkins/jnlp-slave
+
+USER root
+
+# Install Ansible
+RUN apt-get update \
+&& apt-get install ansible -y
+
+# Install Maven and Docker
+RUN curl http://www-us.apache.org/dist/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.tar.gz | tar zxf - \
+&& mv /home/jenkins/apache-maven-3.5.2/ /opt/ \
+&& apt-get install -y libip4tc0 libip6tc0 libiptc0 libxtables12 libnetfilter-conntrack3 libnfnetlink0 dmsetup iptables libdevmapper1.02.1 libseccomp2 libltdl7 \
+&& curl -O https://download.docker.com/linux/debian/dists/stretch/pool/stable/amd64/docker-ce_17.12.0~ce-0~debian_amd64.deb \
+&& dpkg -i docker-ce_17.12.0~ce-0~debian_amd64.deb \
+&& rm -f docker-ce_17.12.0~ce-0~debian_amd64.deb \
+&& gpasswd -a jenkins docker
+
+# Install AWS CLI
+RUN curl -O https://bootstrap.pypa.io/get-pip.py \
+&& python get-pip.py \
+&& pip install awscli --upgrade \
+&& rm -f get-pip.py
+
+# Install Terraform
+RUN curl -O https://releases.hashicorp.com/terraform/0.11.3/terraform_0.11.3_linux_amd64.zip \
+&& unzip terraform_0.11.3_linux_amd64.zip \
+&& mv terraform /usr/local/sbin/ \
+&& rm -f terraform_0.11.3_linux_amd64.zip
+
+# Install Packer
+RUN curl -O https://releases.hashicorp.com/packer/1.2.1/packer_1.2.1_linux_amd64.zip \
+&& unzip packer_1.2.1_linux_amd64.zip \
+&& mv packer /usr/local/sbin/ \
+&& rm -f packer_1.2.1_linux_amd64.zip
+
+USER jenkins
+ENV PATH=$PATH:/opt/apache-maven-3.5.2/bin
+
+ENTRYPOINT ["jenkins-slave"]

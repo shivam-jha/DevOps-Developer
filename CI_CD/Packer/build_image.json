@@ -1,0 +1,30 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "us-east-1",
+      "source_ami": "ami-26ebbc5c",
+      "instance_type": "t2.micro",
+      "ssh_username": "ec2-user",
+      "ami_name": "ccs-demo-tomcat-petclinic-{{timestamp}}",
+	  "vpc_id": "{VPC_ID}",
+	  "subnet_id": "{SUBNET_ID}",
+	  "security_group_id": "{SG_ID}",
+	  "ssh_keypair_name": "demo-ssh-key",
+	  "ssh_private_key_file": "key.pem",
+	  "tags": {
+		"Name": "ccs-demo-tomcat-petclinic-{{timestamp}}"
+	  }
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "../Ansible/hardening/site.yml"
+    },
+    {
+      "type": "ansible",
+      "playbook_file": "../Ansible/deploy/site.yml"
+    }
+  ]
+}
